@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Разворот адреса</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f4f6f8; margin: 0; padding: 32px 16px; color: #1d2d3e;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  .sub { color: #5a6b7c; margin: 0 0 24px; }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .col { flex: 1 1 420px; }
+  .card {
+    background: #fff; border: 1px solid #dfe6ec; border-radius: 12px;
+    padding: 18px; box-shadow: 0 1px 3px rgba(16,36,58,.06);
+  }
+  .card h2 { font-size: 15px; margin: 0 0 10px; font-weight: 600; }
+  textarea {
+    width: 100%; min-height: 170px; resize: vertical;
+    border: 1px solid #cfd9e2; border-radius: 8px; padding: 10px;
+    font-family: inherit; font-size: 14px; line-height: 1.45;
+  }
+  textarea:focus { outline: 2px solid #7aa7e8; border-color: #7aa7e8; }
+  .out {
+    width: 100%; min-height: 170px; overflow: auto; white-space: pre-wrap;
+    border: 1px solid #cfd9e2; border-radius: 8px; padding: 10px;
+    font-family: "Times New Roman", Times, serif; font-size: 14pt;
+    background: #fdfdfb;
+  }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  button {
+    border: 0; border-radius: 8px; padding: 10px 16px; font-size: 14px;
+    cursor: pointer; background: #e8edf2; color: #1d2d3e;
+  }
+  button:hover { background: #dbe3ea; }
+  button.primary { background: #2f6fed; color: #fff; }
+  button.primary:hover { background: #255bc9; }
+  button.warn { background: #f0b429; }
+  button.danger { background: #e5484d; color: #fff; }
+  .note { color: #5a6b7c; font-size: 13px; margin-top: 14px; line-height: 1.5; }
+  .badge {
+    display: inline-block; background: #e5484d; color: #fff; border-radius: 10px;
+    font-size: 11px; padding: 1px 7px; margin-left: 6px; vertical-align: 1px;
+  }
+  .modal-back {
+    display: none; position: fixed; inset: 0; background: rgba(20,30,40,.45);
+    z-index: 50; overflow: auto; padding: 40px 16px;
+  }
+  .modal-back.open { display: block; }
+  .modal {
+    background: #fff; max-width: 760px; margin: 0 auto; border-radius: 12px;
+    padding: 22px 24px; box-shadow: 0 8px 30px rgba(0,0,0,.25);
+  }
+  .modal h3 { margin: 0 0 14px; font-size: 18px; }
+  .err-item {
+    border: 1px solid #e3e9ef; border-radius: 8px; padding: 10px 12px;
+    margin-bottom: 10px; font-size: 14px; line-height: 1.5;
+  }
+  .err-item .src { color: #7a2e2e; }
+  .err-item .dst { font-family: "Times New Roman", Times, serif; font-size: 14pt; }
+  .err-item .lbl { font-size: 11px; text-transform: uppercase; color: #8896a5; letter-spacing: .4px; }
+  .modal .btns { justify-content: space-between; }
+  .help h4 { margin: 14px 0 4px; font-size: 14px; }
+  .help p, .help li { font-size: 14px; line-height: 1.55; }
+  .help ul { margin: 4px 0 8px 20px; padding: 0; }
+  .copied { background: #2f9e44 !important; color: #fff !important; }
+  .empty { color: #8896a5; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Разворот адреса</h1>
+  <p class="sub">Вставьте адрес в любом формате — справа появится вариант в порядке: тип улицы, название улицы, дом, город/село, регион, индекс.</p>
+
+  <div class="row">
+    <div class="col card">
+      <h2>Исходный адрес</h2>
+      <textarea id="src" placeholder="Например: 656023, Россия, Алтайский край , г. Барнаул , Космонавтов пр-кт 45, ,"></textarea>
+    </div>
+    <div class="col card">
+      <h2>Готовый адрес (Times New Roman, 14 пт)</h2>
+      <div class="out" id="dst"></div>
+    </div>
+  </div>
+
+  <div class="btns">
+    <button class="primary" id="btnCopy">Скопировать адрес</button>
+    <button id="btnExample">Пример</button>
+    <button id="btnClear">Очистить</button>
+    <button class="warn" id="btnMarkErr">Ошибка</button>
+    <button id="btnViewErr">Просмотр ошибок<span class="badge" id="errCount" style="display:none">0</span></button>
+    <button id="btnHelp">Инструкция</button>
+    <button id="btnRules">Правила исправления</button>
+  </div>
+
+  <p class="note">Города федерального значения (Москва, Санкт-Петербург, Севастополь) выводятся без «г.». Порядок сборки: тип улицы, название, дом, город/село/пгт, республика/край/область, индекс. Копируется текст готового адреса. Кнопка «Ошибка» сохраняет пару «исходный → готовый» адрес для последующей выгрузки и доработки приложения.</p>
+</div>
+
+<!-- Просмотр ошибок -->
+<div class="modal-back" id="mErrors">
+  <div class="modal">
+    <h3>Сохранённые ошибки</h3>
+    <div id="errList"></div>
+    <div class="btns">
+      <button class="danger" id="btnErrClear">Удалить все ошибки</button>
+      <button class="primary" id="btnErrExport">Выгрузить в файл</button>
+      <button id="btnErrClose">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- Инструкция -->
+<div class="modal-back" id="mHelp">
+  <div class="modal help">
+    <h3>Инструкция по функциям приложения</h3>
+    <h4>Поле «Исходный адрес»</h4>
+    <p>Сюда вставляйте адрес в любом виде — с лишними запятыми, пробелами, словом «Россия», сокращениями или в развёрнутом виде. Готовый адрес пересчитывается автоматически при каждом изменении текста, кнопку нажимать не нужно.</p>
+    <h4>Поле «Готовый адрес»</h4>
+    <p>Здесь появляется нормализованный адрес. Шрифт — Times New Roman, 14 пт. Текст из этого поля копируется в буфер обмена.</p>
+    <h4>Скопировать адрес</h4>
+    <p>Помещает текст из правого поля в буфер обмена. Кнопка зеленеет на секунду — значит, копирование прошло. Дальше текст можно вставить в Excel, письмо или документ.</p>
+    <h4>Пример</h4>
+    <p>Подставляет в левое поле демонстрационную строку (адрес в Барнауле с типичными дефектами), чтобы посмотреть, как работает преобразование.</p>
+    <h4>Очистить</h4>
+    <p>Стирает оба поля и сбрасывает результат.</p>
+    <h4>Ошибка</h4>
+    <p>Нажмите, если готовый адрес получился неправильным. Текущие исходный и готовый адреса сохранятся в список ошибок внутри приложения (данные хранятся в браузере и не пропадают после закрытия страницы). Рядом с кнопкой появляется счётчик сохранённых ошибок.</p>
+    <h4>Просмотр ошибок</h4>
+    <p>Открывает список всех сохранённых ошибок: каждая запись показывает исходный текст и то, что выдало приложение. Здесь три действия: «Выгрузить в файл» (см. ниже), «Удалить все ошибки» (полная очистка списка) и «Закрыть».</p>
+    <h4>Выгрузить в файл</h4>
+    <p>Сохраняет все накопленные ошибки в файл errors.csv — в виде таблицы из двух колонок: исходный адрес и готовый адрес. Файл открывается в Excel и присылается разработчику для доработки правил. После выгрузки список не очищается — удаляйте вручную кнопкой «Удалить все ошибки».</p>
+    <h4>Инструкция</h4>
+    <p>Открывает это описание — краткую справку по каждой кнопке и полю приложения.</p>
+    <h4>Правила исправления</h4>
+    <p>Открывает перечень правил, по которым приложение преобразует адрес. Если адрес обработан вопреки этим правилам — жмите «Ошибка».</p>
+    <div class="btns"><button class="primary" id="btnHelpClose">Понятно</button></div>
+  </div>
+</div>
+
+<!-- Правила -->
+<div class="modal-back" id="mRules">
+  <div class="modal help">
+    <h3>Правила исправления адреса</h3>
+    <ul>
+      <li><b>Порядок сборки:</b> тип улицы, название улицы, дом, город/село/пгт, республика/край/область, индекс.</li>
+      <li><b>Слово «Россия»</b> удаляется в любой позиции адреса.</li>
+      <li><b>Лишние символы:</b> двойные пробелы, неразрывные пробелы, переводы строк, « ,», «,,», запятые в начале и конце строки убираются.</li>
+      <li><b>Сокращения приводятся к виду с точкой:</b> «город» → «г.», «г Барнаул» → «г. Барнаул», «Д. 25» → «д. 25», «Ул.» → «ул.».</li>
+      <li><b>Тип улицы всегда в начале:</b> «Космонавтов пр-кт» → «пр-кт. Космонавтов»; «площадь Красной Армии» → «пл. Красной Армии»; у «шоссе» точка не ставится.</li>
+      <li><b>Дом приклеивается к улице:</b> если номер «45» или «45а» стоит отдельной частью, он превращается в «д. 45» и ставится после улицы; «корп.» и «стр.» остаются рядом с домом.</li>
+      <li><b>Города федерального значения</b> (Москва, Санкт-Петербург, Севастополь) выводятся без «г.».</li>
+      <li><b>Индекс</b> — 6 цифр — всегда ставится последним, где бы он ни стоял в исходной строке.</li>
+      <li><b>Уже правильный адрес</b> остаётся без изменений: если структура «ул. X, д. N, г. Y, регион, индекс» уже соблюдена, приложение ничего не переставляет.</li>
+      <li><b>Если город или регион найти не удалось,</b> адрес возвращается очищенным, но без перестановки частей — такие случаи стоит отмечать кнопкой «Ошибка».</li>
+    </ul>
+    <div class="btns"><button class="primary" id="btnRulesClose">Понятно</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var FEDERAL = ["москва", "санкт-петербург", "санкт петербург", "спб", "спб.", "севастополь"];
+
+  var TYPES = ["пр-кт", "проспект", "просп", "улица", "ул", "переулок", "пер",
+               "площадь", "пл", "шоссе", "бульвар", "бул", "мкрн", "мкр", "кв-л", "наб", "проезд"];
+  var TYPE_RE = TYPES.join("|");
+
+  function fmtTypeWord(w) {
+    var l = w.toLowerCase();
+    if (l === "шоссе") return "шоссе";
+    if (l === "ул") return "ул.";
+    if (l === "пр-кт") return "пр-кт.";
+    return l + ".";
+  }
+
+  function isIndex(p) { return p.length === 6 && /^\d{6}$/.test(p); }
+
+  function isHouse(p) {
+    if (p.length === 0 || p.length > 4 || /\s|-/.test(p)) return false;
+    if (!/[0-9]$|[0-9][а-яё]$/i.test(p)) return false;
+    return /^[0-9]+[а-яё]?$/i.test(p);
+  }
+
+  function isRegion(p) {
+    var l = p.toLowerCase();
+    return l.indexOf("край") > -1 || l.indexOf("обл") > -1 ||
+           l.indexOf("респ") > -1 || l.indexOf("автономн") > -1 ||
+           l.indexOf("округ") > -1;
+  }
+
+  function isCity(p) {
+    var t = p.trim();
+    if (t.indexOf(" ") < 0) return false;
+    var w = t.split(" ")[0].toLowerCase().replace(/\./g, "");
+    return ["г", "город", "пгт", "рп", "п", "с", "село", "пос",
+            "поселок", "посёлок", "ст", "станица", "дер", "деревня", "х", "кп"].indexOf(w) > -1;
+  }
+
+  function isStreet(p) {
+    var l = p.toLowerCase();
+    var kw = ["ул", "пр-кт", "проспект", "просп", "пер.", "переулок", "пл.",
+              "площадь", "шоссе", "бул", "мкр", "наб.", "проезд"];
+    for (var i = 0; i < kw.length; i++) if (l.indexOf(kw[i]) > -1) return true;
+    return false;
+  }
+
+  function cityIsFederal(cityBlock) {
+    var l = cityBlock.toLowerCase().replace(/\./g, " ").replace(/\s+/g, " ").trim();
+    for (var i = 0; i < FEDERAL.length; i++) {
+      if (l.indexOf(FEDERAL[i].replace(/\./g, " ")) > -1) return true;
+    }
+    return false;
+  }
+
+  function fixAddr(input) {
+    var s = String(input || "");
+    if (s.trim() === "") return "";
+
+    // 1. Пробелы и невидимые символы
+    s = s.replace(/[\r\n\t]/g, " ").replace(/\u00A0/g, " ");
+    while (s.indexOf("  ") > -1) s = s.split("  ").join(" ");
+    s = s.trim();
+
+    // 2. Убрать "Россия"
+    s = s.replace(/(^|[^а-яё])Россия([\s,.:;]*)/gi, "$1$2");
+
+    // 3. Сокращения
+    s = s.replace(/(^|[^а-яё])город([\s,.:]*)/gi, "$1г.$2");
+    s = s.replace(/(^|[^а-яё])[Гг]\.?\s*([А-ЯЁ])/g, "$1г. $2");
+    s = s.replace(/(^|[^а-яё])[Дд]\.?\s*(\d)/g, "$1д. $2");
+    s = s.replace(/(^|[^а-яё])[Уу]л\.?\s+/g, "$1ул. ");
+
+    // 4. Запятые
+    s = s.replace(/ ,/g, ",");
+    while (s.indexOf(",,") > -1 || s.indexOf(", ,") > -1) {
+      s = s.split(",,").join(",").split(", ,").join(",");
+    }
+    s = s.trim().replace(/^,+/, "").replace(/,+$/, "").trim();
+
+    // 5. Разбить на части
+    var parts = s.split(",").map(function (x) { return x.trim(); });
+    var cityIdx = -1;
+    for (var i = 0; i < parts.length; i++) {
+      if (isCity(parts[i])) { cityIdx = i; break; }
+    }
+    if (cityIdx === -1) return s;
+
+    var streetBlock = "", cityBlock = parts[cityIdx], regionBlock = "", idxVal = "", houseVal = "";
+
+    for (i = 0; i < cityIdx; i++) {
+      var p = parts[i];
+      if (isIndex(p)) idxVal = p;
+      else if (isHouse(p)) houseVal = p;
+      else if (isRegion(p)) regionBlock = append(regionBlock, p);
+      else streetBlock = append(streetBlock, p);
+    }
+    for (i = cityIdx + 1; i < parts.length; i++) {
+      p = parts[i];
+      if (isIndex(p)) idxVal = p;
+      else if (isHouse(p)) houseVal = p;
+      else if (isRegion(p)) regionBlock = append(regionBlock, p);
+      else if (isStreet(p)) streetBlock = append(streetBlock, p);
+      else cityBlock = append(cityBlock, p);
+    }
+
+    // 6. Уличный блок -> "тип. Название, д. N"
+    if (streetBlock !== "") {
+      var re1 = new RegExp("^(.+?)\\s+(" + TYPE_RE + ")\\.?\\s+([0-9]+[а-я]?)$", "i");
+      var re2 = new RegExp("^(" + TYPE_RE + ")\\.?\\s+(.+?)\\s+([0-9]+[а-я]?)$", "i");
+      var re3 = new RegExp("^(.+?)\\s+(" + TYPE_RE + ")\\.?$", "i");
+      if (re1.test(streetBlock)) {
+        streetBlock = streetBlock.replace(re1, function (m, name, type, num) {
+          return fmtTypeWord(type) + " " + name + ", д. " + num;
+        });
+      } else if (re2.test(streetBlock)) {
+        streetBlock = streetBlock.replace(re2, function (m, type, name, num) {
+          return fmtTypeWord(type) + " " + name + ", д. " + num;
+        });
+      } else if (re3.test(streetBlock)) {
+        streetBlock = streetBlock.replace(re3, function (m, name, type) {
+          return fmtTypeWord(type) + " " + name;
+        });
+      }
+      if (houseVal !== "" && streetBlock.toLowerCase().indexOf("д.") === -1) {
+        streetBlock = append(streetBlock, "д. " + houseVal);
+      }
+    }
+
+    // 7. Город федерального значения — без "г."
+    if (cityIsFederal(cityBlock)) {
+      cityBlock = cityBlock.replace(/^[Гг]\.?\s*/, "");
+    }
+
+    // 8. Сборка
+    var res = streetBlock;
+    res = append(res, cityBlock);
+    res = append(res, regionBlock);
+    res = append(res, idxVal);
+    return res;
+  }
+
+  function append(a, b) {
+    if (!b) return a;
+    if (!a) return b;
+    return a + ", " + b;
+  }
+
+  // ---------- Ошибки ----------
+  var KEY = "addr_errors_v1";
+  function loadErrs() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function saveErrs(list) {
+    try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {}
+    updateBadge();
+  }
+  function updateBadge() {
+    var n = loadErrs().length;
+    var b = document.getElementById("errCount");
+    b.style.display = n ? "inline-block" : "none";
+    b.textContent = n;
+  }
+
+  // ---------- Привязка ----------
+  var src = document.getElementById("src");
+  var dst = document.getElementById("dst");
+
+  function render() { dst.textContent = fixAddr(src.value); }
+  src.addEventListener("input", render);
+  render();
+
+  document.getElementById("btnExample").addEventListener("click", function () {
+    src.value = "656023, Россия, Алтайский край , г. Барнаул , Космонавтов пр-кт 45, ,";
+    render();
+  });
+
+  document.getElementById("btnClear").addEventListener("click", function () {
+    src.value = ""; dst.textContent = ""; src.focus();
+  });
+
+  document.getElementById("btnCopy").addEventListener("click", function () {
+    var btn = this;
+    function done() {
+      btn.textContent = "Скопировано ✓";
+      btn.classList.add("copied");
+      setTimeout(function () {
+        btn.textContent = "Скопировать адрес";
+        btn.classList.remove("copied");
+      }, 1200);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(dst.textContent).then(done, function () { fallbackCopy(done); });
+    } else fallbackCopy(done);
+  });
+
+  function fallbackCopy(done) {
+    var ta = document.createElement("textarea");
+    ta.value = dst.textContent;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+
+  // Ошибка: сохранить пару
+  document.getElementById("btnMarkErr").addEventListener("click", function () {
+    if (src.value.trim() === "" && dst.textContent.trim() === "") return;
+    var list = loadErrs();
+    list.push({ src: src.value.trim(), dst: dst.textContent.trim(), ts: new Date().toLocaleString("ru-RU") });
+    saveErrs(list);
+    this.textContent = "Сохранено ✓";
+    var b = this;
+    setTimeout(function () { b.textContent = "Ошибка"; }, 1200);
+  });
+
+  // Просмотр ошибок
+  var mErrors = document.getElementById("mErrors");
+  document.getElementById("btnViewErr").addEventListener("click", function () {
+    renderErrList();
+    mErrors.classList.add("open");
+  });
+  document.getElementById("btnErrClose").addEventListener("click", function () {
+    mErrors.classList.remove("open");
+  });
+
+  function renderErrList() {
+    var list = loadErrs();
+    var box = document.getElementById("errList");
+    if (!list.length) {
+      box.innerHTML = '<p class="empty">Ошибок пока нет. Если готовый адрес получился неправильным — нажмите кнопку «Ошибка», и пара адресов сохранится здесь.</p>';
+      return;
+    }
+    box.innerHTML = "";
+    list.forEach(function (e, i) {
+      var d = document.createElement("div");
+      d.className = "err-item";
+      d.innerHTML =
+        '<div class="lbl">Ошибка №' + (i + 1) + " · " + (e.ts || "") + '</div>' +
+        '<div class="lbl" style="margin-top:6px">Исходный:</div>' +
+        '<div class="src">' + esc(e.src) + '</div>' +
+        '<div class="lbl" style="margin-top:6px">Готовый:</div>' +
+        '<div class="dst">' + esc(e.dst) + '</div>';
+      var del = document.createElement("button");
+      del.textContent = "Удалить";
+      del.style.marginTop = "8px";
+      del.addEventListener("click", function () {
+        list.splice(i, 1); saveErrs(list); renderErrList();
+      });
+      d.appendChild(del);
+      box.appendChild(d);
+    });
+  }
+
+  function esc(t) {
+    return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Выгрузка ошибок в файл
+  document.getElementById("btnErrExport").addEventListener("click", function () {
+    var list = loadErrs();
+    if (!list.length) { alert("Список ошибок пуст — выгружать нечего."); return; }
+    var rows = [["№", "Дата", "Исходный адрес", "Готовый адрес"]];
+    list.forEach(function (e, i) {
+      rows.push([i + 1, e.ts || "", e.src, e.dst]);
+    });
+    var csv = "\uFEFF" + rows.map(function (r) {
+      return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(";");
+    }).join("\r\n");
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "ошибки_разворота_адреса.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+
+  document.getElementById("btnErrClear").addEventListener("click", function () {
+    if (!loadErrs().length) return;
+    if (confirm("Удалить все сохранённые ошибки?")) { saveErrs([]); renderErrList(); }
+  });
+
+  // Инструкция и правила
+  var mHelp = document.getElementById("mHelp"), mRules = document.getElementById("mRules");
+  document.getElementById("btnHelp").addEventListener("click", function () { mHelp.classList.add("open"); });
+  document.getElementById("btnHelpClose").addEventListener("click", function () { mHelp.classList.remove("open"); });
+  document.getElementById("btnRules").addEventListener("click", function () { mRules.classList.add("open"); });
+  document.getElementById("btnRulesClose").addEventListener("click", function () { mRules.classList.remove("open"); });
+
+  // Закрытие модалок кликом по фону
+  [mErrors, mHelp, mRules].forEach(function (m) {
+    m.addEventListener("click", function (ev) {
+      if (ev.target === m) m.classList.remove("open");
+    });
+  });
+
+  updateBadge();
+})();
+</script>
+</body>
+</html>
