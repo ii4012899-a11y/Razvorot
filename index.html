@@ -3,721 +3,393 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Помощник ФССП — поиск без страданий</title>
+<title>Разворот адреса</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#1a1d24; --border:#2a2f3a; --text:#e8eaf0;
-    --muted:#9aa1af; --accent:#3f6ad8; --accent-h:#4f7ae8;
-    --green:#1c7f3f; --green-h:#229a4d; --orange:#b3541e; --done:#3a4150;
-  }
-  body.light{
-    --bg:#f4f5f7; --card:#ffffff; --border:#d9dde3; --text:#1c2330;
-    --muted:#5c6675; --done:#c9ced8;
-  }
-  *{box-sizing:border-box}
-  body{background:var(--bg);color:var(--text);font:16px/1.55 -apple-system,'Segoe UI',Roboto,Arial,sans-serif;margin:0;padding:24px 12px}
-  .wrap{max-width:820px;margin:0 auto}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{font-size:26px;margin:0 0 8px}
-  .intro{color:var(--muted);margin:0 0 20px}
-  label{display:block;margin:0 0 6px;color:var(--muted);font-size:14px}
-  textarea{width:100%;min-height:96px;resize:vertical;background:var(--card);color:var(--text);
-    border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:16px;outline:none}
-  textarea:focus{border-color:var(--accent)}
-  .hint{color:var(--muted);font-size:13px;margin:6px 0 18px}
-  .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
-  .btn{border:none;border-radius:10px;padding:12px 18px;font-size:15px;cursor:pointer;color:#fff;background:var(--accent)}
-  .btn:hover{background:var(--accent-h)}
-  .btn:disabled{opacity:.45;cursor:not-allowed}
-  .btn.primary{background:var(--accent)}
-  .btn.green{background:var(--green)}
-  .btn.green:hover{background:var(--green-h)}
-  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-  .btn.small{padding:8px 14px;font-size:14px}
-  .btn.done{background:var(--done)}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px}
-  .card .row{display:flex;gap:12px;padding:4px 0;font-size:15px}
-  .card .row span{color:var(--muted);width:150px;flex:none}
-  .ok{color:#43c46b}
-  .miss{color:#e08a4e}
-  #queue .q-row{display:flex;align-items:center;gap:12px;padding:8px 4px;border-bottom:1px solid var(--border)}
-  #queue .q-row:last-child{border-bottom:none}
-  .q-fio{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .q-date{color:var(--muted);width:90px;flex:none;font-size:14px}
-  .warn{color:#e08a4e;font-size:13px}
-  .queue-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;color:var(--muted);font-size:14px}
-  details{margin:14px 0;border-top:1px solid var(--border);padding-top:12px}
-  summary{cursor:pointer;font-weight:600}
-  pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--border);
-    border-radius:8px;padding:12px;font-size:12px;max-height:320px;overflow:auto}
-  ol,ul{margin:10px 0;padding-left:22px}
-  li{margin:8px 0}
-  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:28px}
+*{box-sizing:border-box;}
+body{font-family:"Segoe UI",Arial,sans-serif;margin:0;background:#f4f6f4;color:#2c3e33;}
+header{background:#375c47;color:#fff;padding:14px 24px;}
+h1{margin:0;font-size:22px;font-weight:600;}
+h3{margin-top:0;}
+.wrap{max-width:1100px;margin:0 auto;padding:16px;}
+.tabs{display:flex;gap:6px;margin-bottom:0;}
+.tab{padding:9px 18px;border:1px solid #9db8a6;border-bottom:none;background:#fff;border-radius:8px 8px 0 0;cursor:pointer;font-size:15px;}
+.tab.active{background:#375c47;color:#fff;border-color:#375c47;}
+.panel{background:#fff;border:1px solid #d7e2d9;border-radius:0 10px 10px 10px;padding:18px;}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+label{display:block;font-weight:600;margin-bottom:6px;}
+textarea{width:100%;height:150px;padding:10px;border:1px solid #b7c9bd;border-radius:8px;font-size:15px;resize:vertical;font-family:inherit;}
+textarea:focus{outline:2px solid #7fb069;}
+.out{min-height:150px;border:1px solid #b7c9bd;border-radius:8px;padding:10px;font-family:"Times New Roman",Times,serif;font-size:14pt;background:#fbfdfb;overflow-wrap:anywhere;white-space:pre-wrap;}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center;}
+button{padding:8px 14px;border:1px solid #9db8a6;background:#fff;border-radius:8px;cursor:pointer;font-size:14px;}
+button:hover{background:#eef5ef;}
+button.primary{background:#375c47;color:#fff;border-color:#375c47;}
+button.primary:hover{background:#2e4c3b;}
+button.ok{background:#dff0d8;border-color:#5b8c5a;}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;}
+th,td{border:1px solid #cddbd2;padding:7px 9px;vertical-align:top;text-align:left;}
+th{background:#e8f0ea;}
+td.src{word-break:break-word;}
+td.fix{font-family:"Times New Roman",Times,serif;font-size:14pt;word-break:break-word;}
+tr.err-row{background:#fdeceb;}
+.tag{color:#c0392b;font-weight:600;font-size:12px;display:block;margin-top:4px;}
+textarea.correct{width:100%;height:64px;font-size:14px;border:1px solid #b7c9bd;border-radius:6px;padding:6px;}
+textarea.correct:focus{outline:2px solid #7fb069;}
+.cross{color:#c0392b;font-weight:700;font-size:18px;border:none;background:none;cursor:pointer;padding:2px 8px;}
+.cross:hover{background:#fdeceb;border-radius:6px;}
+.modal{display:none;position:fixed;inset:0;background:rgba(20,35,26,.5);z-index:50;}
+.modal.open{display:block;}
+.modal .card{background:#fff;max-width:980px;margin:36px auto;padding:20px 24px;border-radius:12px;max-height:82vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+.count{font-weight:700;}
+.hint{color:#6b7f72;font-size:13px;margin-top:6px;}
+.help p,.rules li{font-size:14px;line-height:1.5;}
+.rules ul{padding-left:20px;}
+.rules li{margin:6px 0;}
+.empty{color:#8a9a90;padding:10px 4px;font-style:italic;}
+@media (max-width:760px){.row{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
+<header><h1>Разворот адреса</h1></header>
 <div class="wrap">
-  <header>
-    <h1>🕵️ Помощник ФССП</h1>
-    <button id="theme-toggle" class="btn ghost" title="Сменить тему">🌙</button>
-  </header>
-  <p class="intro">Вставьте ФИО и дату — получите заполненную форму на сайте ФССП. Кнопку «Найти» скрипт нажмёт сам, капчу вводите руками: это её работа, не наша.</p>
-
-  <label for="fio-input"><b>ФИО и дата рождения</b> — одна или несколько строк; из Excel можно вставить сразу две колонки (ФИО и дата через табуляцию)</label>
-  <textarea id="fio-input" placeholder="Иванов Иван Иванович 01.01.1950&#10;Петров Пётр Петрович 15.03.1975"></textarea>
-  <div class="hint">Пойму одной строкой: «Иванов Иван Иванович 01.01.1950». Дата нужна обязательно — без неё ФССП искать отказывается наотрез.</div>
-
-  <div class="btn-row">
-    <button id="btn-go" class="btn primary">🚀 Открыть ФССП и заполнить</button>
-    <button id="btn-test" class="btn green">🧪 Тест: Иванов Иван Иванович 01.01.1950</button>
-    <button id="btn-help" class="btn ghost">📖 Как всё настроить</button>
-    <button id="btn-clear" class="btn ghost">Очистить</button>
-  </div>
-
-  <div id="preview" class="card">
-    <div class="row"><span>Фамилия:</span><b id="p-fam" class="miss">—</b></div>
-    <div class="row"><span>Имя:</span><b id="p-nam" class="miss">—</b></div>
-    <div class="row"><span>Отчество:</span><b id="p-otc" class="miss">—</b></div>
-    <div class="row"><span>Дата рождения:</span><b id="p-date" class="miss">—</b></div>
-    <div class="row"><span>Регион:</span><b>все регионы RU</b></div>
-  </div>
-
-  <div id="queue" style="display:none">
-    <div class="queue-head">
-      <b id="q-counter"></b>
-      <button id="btn-reset" class="btn ghost small">Сбросить отметки</button>
-    </div>
-    <div id="q-list"></div>
-  </div>
-
-  <div id="help-panel" class="card" style="display:none">
-    <h2>📖 Инструкция для первого раза (5 минут)</h2>
-    <p>Сайт ФССП не позволяет чужим страницам заполнять свои формы напрямую — так устроена безопасность браузеров. Поэтому нужны два элемента: эта страничка (она уже у вас есть) и маленькое расширение со скриптом. Ставится один раз.</p>
-    <ol>
-      <li>Установите расширение <b>Tampermonkey</b>. Для браузеров на Chromium (Chrome, Яндекс.Браузер, Edge, Opera) — магазин Chrome. Для Firefox — addons.mozilla.org.</li>
-      <li>Скопируйте скрипт автозаполнения: нажмите кнопку «📋 Скопировать скрипт (v2.0)». Если кнопка засомневалась, раскройте блок со скриптом ниже и скопируйте вручную (Ctrl+C).</li>
-      <li>Вставьте скрипт в Tampermonkey: иконка Tampermonkey → «Создать новый скрипт» → удалить всё → вставить → сохранить (Ctrl+S). Если там уже лежала старая версия — замените её целиком. В панели Tampermonkey должна остаться <b>одна</b> копия скрипта версии 2.0.</li>
-      <li>Проверьте связку: нажмите зелёную кнопку «🧪 Тест». Откроется сайт ФССП, поля заполнятся, регион выберется, «Найти» нажмётся сам.</li>
-      <li>Введите капчу в открывшемся окне — и увидите результаты поиска. Капчу ФССП оставил вам: это мера защиты сайта от роботов. Зато вы теперь официально не робот — поздравляем. 🏅</li>
-    </ol>
-
-    <h3>Работа со списком</h3>
-    <ul>
-      <li>Вставьте несколько строк — по одному человеку в строке. Из Excel можно скопировать сразу две колонки (ФИО и дата) — они разложатся автоматически.</li>
-      <li>У каждого в очереди появится кнопка «Найти»: нажмите — откроется ФССП с заполненной формой, а кнопка пометится «✓ Нажата».</li>
-      <li>Работаете на сайте (капча, смотрите результаты), возвращаетесь во вкладку помощника и жмёте следующую кнопку.</li>
-      <li>Отметки хранятся в браузере и переживают перезагрузку странички. «Сбросить отметки» — пройти список заново. Повторный клик по нажатой кнопке тоже можно — поиск повторится.</li>
-      <li>Строки без даты помечаются «нет даты» — ФССП их не примет. Допишите дату прямо в поле — строка заработает.</li>
-    </ul>
-
-    <button id="btn-copy" class="btn primary">📋 Скопировать скрипт (v2.0)</button>
-    <div id="copy-msg" class="hint" style="display:none">Скопировано — вставляйте в Tampermonkey и сохраняйте (Ctrl+S).</div>
-
-    <details><summary>Скрипт текстом (для ручного копирования)</summary><pre id="script-plain">…</pre></details>
-
-    <details><summary>🛠 Если что-то не так (наиболее частые случаи)</summary>
-      <ul>
-        <li><b>Поля на ФССП пустые.</b> Проверьте: иконка Tampermonkey активна на странице ФССП? Скрипт сохранён? В адресной строке открыто именно fssp.gov.ru/iss/ip?… — с параметрами после знака вопроса.</li>
-        <li><b>Скрипт «не работает» совсем.</b> В панели Tampermonkey не осталось нескольких копий — дубли мешают друг другу. Должна быть одна, версии 2.0.</li>
-        <li><b>«Найти» не нажался сам.</b> Нажмите кнопку вручную — ничего не сломается. В плашке в правом нижнем углу написано, что именно скрипт не нашёл.</li>
-        <li><b>Отметки «✓ Нажата» слетели.</b> Такое бывает, если браузер не сохраняет данные локальных страниц. Пометки можно просто проставить заново — или сказать мне, переключу способ хранения.</li>
-        <li><b>Сайт ФССП обновился.</b> Если разработчики ФССП переверстают форму, скрипт может перестать находить поля. Такое случается редко, но случается — тогда скрипт нужно будет слегка подправить.</li>
-        <li><b>Дата не распознана.</b> Форматы дд.мм.гггг и гггг-мм-дд понимаются; Excel иногда приписывает «0:00:00» — это вычищается автоматически.</li>
-      </ul>
-    </details>
-
-    <details><summary>🔒 Про безопасность (коротко и честно)</summary>
-      <p>Скрипт работает только на сайте fssp.gov.ru, ничего никуда не отправляет и паролей не собирает. Он лишь заполняет те поля, которые вы и так заполняли бы вручную — просто быстрее и без опечаток. Эта страничка тоже живёт целиком в вашем браузере.</p>
-    </details>
-  </div>
-
-  <footer>Помощник ФССП · работает локально · капча остаётся на совести роботов ФССП</footer>
+<div class="tabs">
+<button class="tab active" id="tab1">Одиночный адрес</button>
+<button class="tab" id="tab2">Пакет адресов</button>
 </div>
 
-<script type="text/plain" id="userscript-src">
-// ==UserScript==
-// @name         ФССП Автозаполнение (ФИО + дата рождения)
-// @namespace    fssp-helper
-// @version      2.0
-// @description  Заполняет форму поиска ИП на fssp.gov.ru и нажимает «Найти»; капчу вводит человек
-// @match        https://fssp.gov.ru/iss/ip*
-// @match        https://*.fssp.gov.ru/iss/ip*
-// @run-at       document-idle
-// @grant        none
-// ==/UserScript==
+<div class="panel" id="panel1">
+<div class="row">
+<div>
+<label for="src">Исходный адрес</label>
+<textarea id="src" placeholder="Вставьте адрес в любом виде — результат пересчитается автоматически"></textarea>
+</div>
+<div>
+<label>Готовый адрес (Times New Roman, 14 пт)</label>
+<div class="out" id="out"></div>
+</div>
+</div>
+<div class="btns">
+<button class="primary" id="btnCopy">Скопировать адрес</button>
+<button id="btnExample">Пример</button>
+<button id="btnClear">Очистить</button>
+<button id="btnErrSingle">Ошибка</button>
+<button id="btnViewErr">Просмотр ошибок <span class="count" id="cnt1">0</span></button>
+<button id="btnHelp">Инструкция</button>
+<button id="btnRules">Правила исправления</button>
+</div>
+</div>
 
-(function () {
-  'use strict';
+<div class="panel" id="panel2" style="display:none">
+<label for="pkSrc">Вставьте адреса из Excel — по одному в строке (столбец копируется построчно)</label>
+<textarea id="pkSrc" placeholder="РОССИЯ,141552,Московская обл,Солнечногорский р-н,Ржавки рп,д.15,кв.74&#10;РОССИЯ, 127560, Москва г, Конёнкова ул, д.12а, кв.160"></textarea>
+<div class="btns">
+<button class="primary" id="btnProcess">Обработать</button>
+<button id="btnPkExample">Пример пачки</button>
+<button id="btnPkClear">Очистить</button>
+<button id="btnPkExport">Выгрузить весь пакет</button>
+</div>
+<div class="hint">Если во вставленном куске встретится табуляция, ячейки склеятся пробелом в одну строку — адрес всё равно обработается.</div>
+<table id="pkTable">
+<thead><tr><th style="width:44px">№</th><th>Исходный адрес</th><th>Готовый адрес (Times New Roman, 14 пт)</th><th style="width:120px">Копировать</th><th style="width:110px">Ошибка</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
 
-  const p = new URLSearchParams(location.search);
-  if (!p.get('fam')) return;
+<div class="modal" id="mErr"><div class="card">
+<h3>Сохранённые ошибки</h3>
+<table id="errTable"><thead><tr><th>Было</th><th>Стало</th><th>Как надо</th><th style="width:40px"></th></tr></thead><tbody></tbody></table>
+<div id="errEmpty" class="empty" style="display:none">Список пуст.</div>
+<div class="btns">
+<button class="primary" id="btnErrExport">Выгрузить ошибки в файл</button>
+<button id="btnErrDelAll">Удалить все ошибки</button>
+<button id="btnErrClose">Закрыть</button>
+</div>
+<div class="hint">В колонке «Как надо» уже подставлен отформатированный адрес — исправьте его на правильный, запись сохранится автоматически. Крестик убирает запись из списка.</div>
+</div></div>
 
-  const data = {
-    fam: p.get('fam') || '',
-    nam: p.get('nam') || '',
-    otc: p.get('otc') || '',
-    bday: (p.get('bday') || '').padStart(2, '0'),
-    bmonth: (p.get('bmonth') || '').padStart(2, '0'),
-    byear: p.get('byear') || ''
-  };
+<div class="modal" id="mHelp"><div class="card help">
+<h3>Инструкция по функциям приложения</h3>
+<p><b>Вкладки.</b> «Одиночный адрес» — один адрес, «Пакет адресов» — вставка столбца из Excel.</p>
+<p><b>Поле «Исходный адрес».</b> Вставляйте адрес в любом виде — с лишними запятыми, пробелами, словом «Россия», сокращениями или в развёрнутом виде. Готовый адрес пересчитывается автоматически, кнопку нажимать не нужно.</p>
+<p><b>Поле «Готовый адрес».</b> Нормализованный адрес, шрифт — Times New Roman, 14 пт.</p>
+<p><b>Скопировать адрес</b> — помещает готовый адрес в буфер обмена. Кнопка зеленеет на секунду — копирование прошло.</p>
+<p><b>Пример</b> — подставляет демонстрационную строку, чтобы посмотреть, как работает преобразование. <b>Очистить</b> — стирает оба поля.</p>
+<p><b>Ошибка</b> — сохраняет пару «исходный → готовый» в список ошибок. Данные хранятся в браузере и не пропадают после закрытия страницы.</p>
+<p><b>Просмотр ошибок</b> — таблица из трёх колонок: «Было» (исходный адрес), «Стало» (что выдало приложение), «Как надо» (правильный вариант). В поле «Как надо» при добавлении записи уже подставлен отформатированный адрес — исправьте его поверх. Изменения сохраняются сами. Крестик в строке убирает запись из списка.</p>
+<p><b>Выгрузить ошибки в файл</b> — сохраняет список в errors.csv: колонки «Режим», «Исходный адрес», «Готовый адрес», «Как должно быть». Файл открывается в Excel. Список после выгрузки не очищается.</p>
+<p><b>Пакет адресов.</b> Вставьте столбец из Excel в поле (каждая строка — отдельный адрес) и нажмите «Обработать». Появится таблица: исходный адрес, отформатированный, кнопки «Копировать» и «Ошибка» для каждой строки. Строки с отмеченной ошибкой подсвечиваются. Если во вставленном тексте есть табуляция, ячейки склеятся пробелом.</p>
+<p><b>Выгрузить весь пакет</b> — сохраняет все обработанные адреса: №, исходный, отформатированный, «как должно быть» и отметку об ошибке.</p>
+<p><b>Инструкция / Правила исправления</b> — эта справка и перечень правил преобразования. Если адрес обработан вопреки правилам — жмите «Ошибка».</p>
+<button class="primary" onclick="document.getElementById('mHelp').classList.remove('open')">Понятно</button>
+</div></div>
 
-  const done = { fam: false, nam: false, otc: false, date: false, region: false, clicked: false };
-  const report = { err: '', debug: '', region: '' };
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-  // ---------- плашка ----------
-  function plaque() {
-    let box = document.getElementById('fssp-helper-status');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'fssp-helper-status';
-      box.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:99999;' +
-        'color:#fff;padding:10px 14px;border-radius:8px;font:13px/1.45 sans-serif;' +
-        'box-shadow:0 4px 12px rgba(0,0,0,.35);max-width:420px;white-space:pre-line';
-      document.body.appendChild(box);
-    }
-    return box;
-  }
-
-  function showStatus(final, keepMs) {
-    const box = plaque();
-    const allOk = done.fam && done.nam && done.date && done.region;
-    box.style.background = allOk ? '#1c7f3f' : '#b3541e';
-    box.textContent =
-      'Помощник ФССП v2.0\n' +
-      'Фамилия: ' + (done.fam ? 'OK' : 'ищу…') +
-      ' · Имя: ' + (done.nam ? 'OK' : 'ищу…') +
-      ' · Отчество: ' + (done.otc ? 'OK' : 'ищу…') + '\n' +
-      'Дата рождения: ' + (done.date ? 'OK' : 'ищу…') +
-      ' · Регион: ' + (done.region ? 'OK' : 'ищу…') + '\n' +
-      'Кнопка «Найти»: ' + (done.clicked ? 'нажала ✅' : 'жду заполнения') +
-      (report.region ? '\nРегион, детали: ' + report.region : '') +
-      (report.err ? '\nОшибка: ' + report.err : '') +
-      (report.debug ? '\nВидимые поля: ' + report.debug : '') +
-      (final && !allOk ? '\nНедостающее впишите руками и нажмите «Найти».' : '');
-    if (final) setTimeout(() => box.remove(), keepMs || 20000);
-  }
-
-  window.addEventListener('error', e => { report.err = e.message; showStatus(false); });
-
-  // ---------- видимость ----------
-  function visible(el) {
-    if (!el) return false;
-    if (el.type === 'hidden' || el.readOnly || el.disabled) return false;
-    return !!(el.offsetParent || el.getClientRects().length);
-  }
-
-  let activeDoc = document;
-  function detectDoc() {
-    if (document.querySelector('input')) { activeDoc = document; return; }
-    for (const f of document.querySelectorAll('iframe')) {
-      try {
-        const d = f.contentDocument;
-        if (d && d.querySelector('input')) { activeDoc = d; return; }
-      } catch (e) {}
-    }
-    activeDoc = document;
-  }
-
-  const textInputs = () => Array.from(activeDoc.querySelectorAll('input'))
-    .filter(i => (i.type === 'text' || i.type === 'date' || !i.type) && visible(i));
-  const labels = () => activeDoc.querySelectorAll(
-    'label, .label, .form-label, .col-form-label, .form-group__label');
-
-  function findInput(re) {
-    const byAttr = textInputs().find(i =>
-      re.test(i.id || '') || re.test(i.name || '') || re.test(i.placeholder || ''));
-    if (byAttr) return byAttr;
-    for (const l of labels()) {
-      if (!re.test((l.textContent || '').trim())) continue;
-      const forId = l.getAttribute && l.getAttribute('for');
-      if (forId && visible(activeDoc.getElementById(forId))) return activeDoc.getElementById(forId);
-      if (l.querySelector) { const inp = l.querySelector('input'); if (visible(inp)) return inp; }
-      const inParent = l.parentElement && l.parentElement.querySelector('input');
-      if (visible(inParent)) return inParent;
-      const next = l.nextElementSibling;
-      const inNext = next && next.querySelector && next.querySelector('input');
-      if (visible(inNext)) return inNext;
-    }
-    return null;
-  }
-
-  // ---------- установка значений ----------
-  function nativeSet(el, value) {
-    const proto = el instanceof HTMLSelectElement
-      ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
-    Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, value);
-  }
-
-  function setVal(el, value) {
-    if (!visible(el) || !value) return false;
-    nativeSet(el, value);
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-    return (el.value || '') === value;
-  }
-
-  function typeInto(el, text) {
-    el.focus();
-    try {
-      if (el.value) {
-        el.setSelectionRange(0, el.value.length);
-        document.execCommand('delete');
-      }
-    } catch (e) {}
-    if (el.value) {
-      nativeSet(el, '');
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-    for (const ch of text) {
-      el.dispatchEvent(new KeyboardEvent('keydown', { key: ch, bubbles: true }));
-      el.dispatchEvent(new KeyboardEvent('keypress', { key: ch, bubbles: true }));
-      let typed = false;
-      try { typed = document.execCommand('insertText', false, ch); } catch (e) {}
-      if (!typed) {
-        nativeSet(el, (el.value || '') + ch);
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-      el.dispatchEvent(new KeyboardEvent('keyup', { key: ch, bubbles: true }));
-    }
-    window.getSelection().removeAllRanges();
-    el.blur();
-  }
-
-  // ---------- поле даты ----------
-  function findDateField() {
-    const real = textInputs().find(i =>
-      i.type === 'date' ||
-      /дд/i.test(i.placeholder || '') ||
-      (/дата|birth|born/i.test((i.id || '') + ' ' + (i.name || '') + ' ' + (i.placeholder || '')) &&
-        !/день|месяц|год\b/i.test((i.id || '') + ' ' + (i.name || ''))));
-    if (real) return real;
-    return findInput(/дата\s*рожд/i);
-  }
-
-  function dateOk(el) {
-    const v = (el.value || '').trim();
-    if (el.type === 'date') return v === data.byear + '-' + data.bmonth + '-' + data.bday;
-    const digits = v.replace(/\D/g, '');
-    return digits.length === 8 && digits === data.bday + data.bmonth + data.byear;
-  }
-
-  let dateRounds = 0;
-  async function fillDate() {
-    const el = findDateField();
-    if (!el) { dateRounds++; return; }
-    const tries = [
-      data.bday + data.bmonth + data.byear,
-      data.bday + '.' + data.bmonth + '.' + data.byear
-    ];
-    for (const v of tries) {
-      if (el.type === 'date') {
-        setVal(el, data.byear + '-' + data.bmonth + '-' + data.bday);
-      } else {
-        typeInto(el, v);
-        await sleep(250);
-      }
-      if (dateOk(el)) { done.date = true; return; }
-    }
-    dateRounds++;
-  }
-
-  // ---------- ФИО ----------
-  function fillFio() {
-    const known = [
-      ['fam', /фамил/i, 'input01'],
-      ['nam', /(^|[\s_-])им[яе]|first_?name/i, 'input02'],
-      ['otc', /отчест/i, 'input03']
-    ];
-    for (const [key, re, id] of known) {
-      if (done[key]) continue;
-      const byId = activeDoc.getElementById(id);
-      if (byId && visible(byId) && !(byId.value || '').trim()) {
-        done[key] = setVal(byId, data[key]);
-        if (done[key]) continue;
-      }
-      done[key] = setVal(findInput(re), data[key]);
-    }
-    if (!done.fam || !done.nam || !done.otc) {
-      const dateEl = findDateField();
-      if (dateEl) {
-        const list = textInputs();
-        const idx = list.indexOf(dateEl);
-        const trio = idx >= 0 ? list.slice(Math.max(0, idx - 3), idx) : list.slice(0, 3);
-        if (trio.length === 3) {
-          if (!done.fam && !(trio[0].value || '').trim()) done.fam = setVal(trio[0], data.fam);
-          if (!done.nam && !(trio[1].value || '').trim()) done.nam = setVal(trio[1], data.nam);
-          if (!done.otc && data.otc && !(trio[2].value || '').trim()) done.otc = setVal(trio[2], data.otc);
-        }
-      }
-    }
-  }
-
-  // ---------- регион «Все регионы» ----------
-  const REGION_RE = /все\s*регион|все\s*субъект/i;
-
-  function findRegionSelect() {
-    return Array.from(activeDoc.querySelectorAll('select')).find(s =>
-      Array.from(s.options).some(o => REGION_RE.test((o.textContent || '').trim()))) || null;
-  }
-
-  function mouseClick(el) {
-    ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(t =>
-      el.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })));
-    if (typeof el.click === 'function') el.click();
-  }
-
-  function pickRegionOption() {
-    const nodes = activeDoc.querySelectorAll(
-      'li, [role="option"], a, .dropdown-item, .select-dropdown li, span');
-    for (const n of nodes) {
-      const t = (n.textContent || '').trim();
-      if (REGION_RE.test(t) && n.getClientRects().length &&
-          (n.children || []).length <= 3 && t.length < 60) {
-        mouseClick(n);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  let regionRounds = 0;
-
-  async function fillRegion() {
-    regionRounds++;
-    let sel = findRegionSelect();
-
-    if (!sel) {
-      const controls = activeDoc.querySelectorAll('div, button, [role="combobox"], [role="listbox"]');
-      for (const c of controls) {
-        const t = (c.textContent || '').trim();
-        if (/территориальн/i.test(t) && t.length < 80 && visible(c)) {
-          mouseClick(c);
-          await sleep(400);
-          const picked = pickRegionOption();
-          await sleep(250);
-          if (picked) { done.region = true; report.region = 'выбрано через виджет'; return; }
-          break;
-        }
-      }
-      report.region = 'селект не найден';
-      return;
-    }
-
-    const opt = Array.from(sel.options).find(o => REGION_RE.test((o.textContent || '').trim()));
-    if (!opt) { report.region = 'опции «все регионы» нет в списке'; return; }
-
-    try {
-      if (window.jQuery) window.jQuery(sel).val(opt.value).trigger('change');
-    } catch (e) {}
-
-    if (sel.value !== opt.value) {
-      nativeSet(sel, opt.value);
-      sel.dispatchEvent(new Event('input', { bubbles: true }));
-      sel.dispatchEvent(new Event('change', { bubbles: true }));
-      sel.dispatchEvent(new Event('blur', { bubbles: true }));
-    }
-
-    report.region = 'значение: «' + sel.value + '» · опций: ' + sel.options.length;
-
-    if (sel.value === opt.value) {
-      const holder = sel.closest('.bootstrap-select, .dropdown, .form-group, .select-wrapper, div');
-      const toggle = holder && holder.querySelector('button.dropdown-toggle, .dropdown-toggle, .filter-option, [role="listbox"]');
-      const toggleText = toggle ? ((toggle.textContent || '') + ' ' + (toggle.title || '')) : '';
-      if (toggle && visible(toggle) && !REGION_RE.test(toggleText)) {
-        mouseClick(toggle);
-        await sleep(350);
-        pickRegionOption();
-        await sleep(250);
-        activeDoc.body && activeDoc.body.dispatchEvent(
-          new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, keyCode: 27, which: 27 }));
-        report.region += ' · надпись виджета синхронизирована';
-      }
-      done.region = true;
-    }
-  }
-
-  // ---------- кнопка «Найти» ----------
-  function clickSearch() {
-    const btns = Array.from(activeDoc.querySelectorAll('button, input[type="submit"], input[type="button"]'))
-      .filter(visible)
-      .filter(x => /найти/i.test(x.textContent || x.value || '') &&
-        !/сброс|очист/i.test(x.textContent || x.value || ''));
-    const b = btns.find(x => /^найти$/i.test((x.textContent || x.value || '').trim())) || btns[0];
-    if (!b) return false;
-    b.scrollIntoView({ block: 'center' });
-    mouseClick(b);
-    return true;
-  }
-
-  // ---------- рабочий цикл ----------
-  let attempts = 0;
-  showStatus(false);
-
-  const timer = setInterval(async () => {
-    attempts++;
-    try {
-      detectDoc();
-
-      fillFio();
-      if (!done.date && dateRounds <= 8) await fillDate();
-      if (!done.region && regionRounds <= 10) await fillRegion();
-
-      report.debug = textInputs().slice(0, 10).map(i =>
-        (i.id || i.name || i.placeholder || 'input') +
-        (i.type === 'date' ? '[ДАТА]' : '') +
-        '(' + (i.value ? i.value.slice(0, 12) : 'пусто') + ')'
-      ).join(' · ');
-
-      showStatus(false);
-
-      if (done.fam && done.nam && done.date && done.region && !done.clicked) {
-        clearInterval(timer);
-        await sleep(400);
-        const ok = clickSearch();
-        done.clicked = ok;
-        if (!ok) report.err = 'кнопка «Найти» не найдена — нажмите вручную';
-        showStatus(true, 20000);
-      } else if (attempts >= 70) {
-        clearInterval(timer);
-        if (!done.region) report.err = 'регион не выбрался — укажите его вручную';
-        showStatus(true, 60000);
-      }
-    } catch (e) {
-      report.err = e.message;
-      showStatus(false);
-    }
-  }, 300);
-})();
-</script>
+<div class="modal" id="mRules"><div class="card rules">
+<h3>Правила исправления адреса</h3>
+<ul>
+<li>Порядок сборки: тип улицы, название улицы, дом, корпус/строение, квартира, населённые пункты, район, область/республика, индекс.</li>
+<li>Слова «Россия», «РФ», «Российская Федерация» удаляются в любой позиции адреса.</li>
+<li>Лишние символы: двойные и неразрывные пробелы, переводы строк, табуляции, « ,», «,,», запятые в начале и конце строки убираются.</li>
+<li>Полные слова приводятся к сокращениям: «город» → «г.», «улица» → «ул.», «проспект» → «пр-кт.», «переулок» → «пер.», «деревня» → «д.», «село» → «с.», «посёлок» → «п.», «дом» → «д.», «квартира» → «кв.», «корпус» → «корп.».</li>
+<li>Тип улицы всегда в начале: «Космонавтов пр-кт» → «пр-кт. Космонавтов», «площадь Красной Армии» → «пл. Красной Армии». «ш» → «шоссе» и «б-р» — без точки: «шоссе Саввинское», «б-р Английский». «проезд» → «пр.»: «2-й Луговой проезд» → «пр. 2-й Луговой».</li>
+<li>Дом: «д.12а» → «д. 12А» (буква заглавная), «д. 5» остаётся. «корп.» и «кв.» ставятся рядом с домом через запятую: «д. 3, корп.3, кв.200». Значения «кв.Нет» и «кв.нет» удаляются из адреса.</li>
+<li>Населённые пункты — тип перед названием: «Балашиха г» → «г. Балашиха», «Ржавки рп» → «рп. Ржавки», «Михайловка д» → «д. Михайловка», «Кагальницкая ст-ца» → «ст-ца. Кагальницкая». Посёлок, село, деревня, рп, ст-ца ставятся перед домом, если улицы в адресе нет, и после блока дома при наличии улицы. Город всегда после блока дома.</li>
+<li>Города федерального значения (Москва, Санкт-Петербург, Севастополь) выводятся без «г.».</li>
+<li>Республика: «Мордовия Респ» → «Респ. Мордовия». Район: «Ковылкинский р-н» → «р-н. Ковылкинский». Область: «Московская обл» → «Московская обл.».</li>
+<li>Индекс — 6 цифр — всегда ставится последним, где бы он ни стоял в исходной строке.</li>
+<li>Уже правильный адрес остаётся без изменений: если структура «ул. X, д. N, г. Y, регион, индекс» уже соблюдена, приложение ничего не переставляет.</li>
+<li>Если часть адреса распознать не удалось, адрес возвращается очищенным, но без перестановки частей — такие случаи стоит отмечать кнопкой «Ошибка».</li>
+</ul>
+<button class="primary" onclick="document.getElementById('mRules').classList.remove('open')">Понятно</button>
+</div></div>
 
 <script>
-(function () {
-  'use strict';
+var STREET = {
+ 'ул':'ул.','улица':'ул.',
+ 'пр-кт':'пр-кт.','пр-т':'пр-кт.','проспект':'пр-кт.',
+ 'проезд':'пр.','пр':'пр.',
+ 'пер':'пер.','переулок':'пер.',
+ 'б-р':'б-р','бул':'б-р','бульвар':'б-р',
+ 'ш':'шоссе','шоссе':'шоссе',
+ 'мкр':'мкр.','мкр-н':'мкр.','мкрн':'мкр.','микрорайон':'мкр.',
+ 'пл':'пл.','площадь':'пл.',
+ 'наб':'наб.','набережная':'наб.',
+ 'туп':'туп.','тупик':'туп.'
+};
+var SETTLE = {
+ 'г':'г.','город':'г.',
+ 'п':'п.','пос':'п.','посёлок':'п.','поселок':'п.',
+ 'с':'с.','село':'с.',
+ 'д':'д.','деревня':'д.',
+ 'рп':'рп.','пгт':'пгт.',
+ 'ст-ца':'ст-ца.','станица':'ст-ца.',
+ 'кп':'кп.','х':'х.','хутор':'х.'
+};
+var FED = ['москва','санкт-петербург','севастополь'];
 
-  var MARKS_KEY = 'fssp_marks_v1';
-  var input = document.getElementById('fio-input');
-  var btnGo = document.getElementById('btn-go');
-  var btnTest = document.getElementById('btn-test');
-  var btnHelp = document.getElementById('btn-help');
-  var btnClear = document.getElementById('btn-clear');
-  var btnReset = document.getElementById('btn-reset');
-  var btnCopy = document.getElementById('btn-copy');
-  var copyMsg = document.getElementById('copy-msg');
-  var helpPanel = document.getElementById('help-panel');
-  var preview = document.getElementById('preview');
-  var queueBox = document.getElementById('queue');
-  var qCounter = document.getElementById('q-counter');
-  var qList = document.getElementById('q-list');
+function cleanAddr(text){
+ var s = String(text == null ? '' : text);
+ s = s.replace(/[\u00a0\u2007\u202f]/g,' ');
+ s = s.replace(/[\u2011\u2013\u2212]/g,'-');
+ s = s.replace(/\t/g,' ');
+ s = s.replace(/\s+/g,' ').trim();
+ s = s.replace(/российская\s+федерация|россия|рф/gi,' ');
+ s = s.replace(/\s*,\s*/g,', ');
+ s = s.replace(/(?:,\s*)+/g,', ');
+ s = s.replace(/^[\s,]+/,'').replace(/[\s,]+$/,'');
+ return s;
+}
 
-  function esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function fixAddress(text){
+ var s = cleanAddr(text);
+ if(!s) return '';
+ var parts = s.split(',').map(function(x){return x.trim();}).filter(function(x){return x;});
+ var street=[], house=[], settles=[], distr=[], regs=[];
+ var index=null, unknown=false;
+ for(var k=0;k<parts.length;k++){
+  var p = parts[k];
+  if(/^\d{6}$/.test(p)){ index=p; continue; }
+  var m = p.match(/^(?:дом|д\.?)\s*(\d+)\s*([а-яёa-z])?$/i);
+  if(m){ var let = m[2]?m[2].toUpperCase():''; house.push('д. '+m[1]+let); continue; }
+  m = p.match(/^(?:корпус|корп|к)\.?\s*(\d+[а-яё]?)$/i);
+  if(m){ house.push('корп.'+m[1]); continue; }
+  m = p.match(/^(?:квартира|кв)\.?\s*(.+)$/i);
+  if(m){ var v = m[1].trim(); if(v.toLowerCase()!=='нет') house.push('кв.'+v); continue; }
+  m = p.match(/^(?:строение|стр)\.?\s*(\d+[а-яё]?)$/i);
+  if(m){ house.push('стр.'+m[1]); continue; }
+  if(/^\d{1,4}[а-яё]?$/i.test(p) && street.length>0){ house.push('д. '+p); continue; }
+  var w = p.split(' ');
+  var lw = w[w.length-1].toLowerCase().replace(/\.+$/,'');
+  if(lw==='обл'||lw==='область'){ regs.push(w.slice(0,-1).join(' ')+' обл.'); continue; }
+  if(lw==='респ'||lw==='республика'){ regs.push('Респ. '+w.slice(0,-1).join(' ')); continue; }
+  if(lw==='край'){ regs.push(w.slice(0,-1).join(' ')+' край.'); continue; }
+  if(lw==='р-н'||lw==='р.н'||lw==='район'){ distr.push('р-н. '+w.slice(0,-1).join(' ')); continue; }
+  if(SETTLE[lw]!==undefined && w.length>=2){ settles.push([SETTLE[lw], w.slice(0,-1).join(' ')]); continue; }
+  if(STREET[lw]!==undefined && w.length>=2){ street.push(STREET[lw]+' '+w.slice(0,-1).join(' ')); continue; }
+  var fw = w[0].toLowerCase().replace(/\.+$/,'');
+  if(STREET[fw]!==undefined && w.length>=2){ street.push(STREET[fw]+' '+w.slice(1).join(' ')); continue; }
+  if(SETTLE[fw]!==undefined && w.length>=2){ settles.push([SETTLE[fw], w.slice(1).join(' ')]); continue; }
+  if((fw==='р-н'||fw==='район') && w.length>=2){ distr.push('р-н. '+w.slice(1).join(' ')); continue; }
+  if(fw==='республика' && w.length>=2){ regs.push('Респ. '+w.slice(1).join(' ')); continue; }
+  if((fw==='обл'||fw==='область') && w.length>=2){ regs.push(w.slice(1).join(' ')+' обл.'); continue; }
+  unknown=true; break;
+ }
+ if(unknown) return s;
+ var villages=[], cities=[];
+ for(var j=0;j<settles.length;j++){
+  var t=settles[j][0], n=settles[j][1];
+  if(FED.indexOf(n.toLowerCase())>=0){ cities.push(n); }
+  else if(t==='г.'){ cities.push('г. '+n); }
+  else { villages.push(t+' '+n); }
+ }
+ var out=[];
+ out = out.concat(street);
+ if(street.length===0) out = out.concat(villages);
+ out = out.concat(house);
+ if(street.length>0) out = out.concat(villages);
+ out = out.concat(cities);
+ out = out.concat(distr);
+ out = out.concat(regs);
+ if(index) out.push(index);
+ return out.join(', ');
+}
+
+/* ---- хранение ---- */
+var LS_ERR='addr_errors_v3', LS_PK='addr_packet_v3';
+var errors=[], pk=[];
+try{ errors = JSON.parse(localStorage.getItem(LS_ERR)||'[]')||[]; }catch(e){ errors=[]; }
+try{ pk = JSON.parse(localStorage.getItem(LS_PK)||'[]')||[]; }catch(e){ pk=[]; }
+function saveErr(){ try{ localStorage.setItem(LS_ERR, JSON.stringify(errors)); }catch(e){} }
+function savePk(){ try{ localStorage.setItem(LS_PK, JSON.stringify(pk)); }catch(e){} }
+
+function $(id){ return document.getElementById(id); }
+function refreshCounts(){
+ var n = String(errors.length);
+ $('cnt1').textContent = n;
+ $('cnt2') && ($('cnt2').textContent = n);
+}
+
+/* ---- вкладки ---- */
+$('tab1').onclick=function(){ $('tab1').classList.add('active'); $('tab2').classList.remove('active'); $('panel1').style.display=''; $('panel2').style.display='none'; };
+$('tab2').onclick=function(){ $('tab2').classList.add('active'); $('tab1').classList.remove('active'); $('panel2').style.display=''; $('panel1').style.display='none'; };
+
+/* ---- одиночный ---- */
+var src=$('src'), out=$('out');
+src.addEventListener('input', function(){ out.textContent = fixAddress(src.value); });
+function copyText(t, btn){
+ var done=function(){ if(btn){ var old=btn.textContent; btn.textContent='Скопировано'; btn.classList.add('ok'); setTimeout(function(){ btn.textContent=old; btn.classList.remove('ok'); },900); } };
+ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done, function(){ fallbackCopy(t); done(); }); }
+ else { fallbackCopy(t); done(); }
+}
+function fallbackCopy(t){
+ var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
+ try{ document.execCommand('copy'); }catch(e){}
+ document.body.removeChild(ta);
+}
+$('btnCopy').onclick=function(){ if(out.textContent) copyText(out.textContent, this); };
+$('btnExample').onclick=function(){ src.value='РОССИЯ, 656015, Барнаул г, Попова ул, д. 25б, кв.12'; out.textContent=fixAddress(src.value); };
+$('btnClear').onclick=function(){ src.value=''; out.textContent=''; };
+$('btnErrSingle').onclick=function(){
+ if(!src.value.trim() || !out.textContent){ alert('Сначала обработайте адрес.'); return; }
+ addError('одиночный', src.value.trim(), out.textContent);
+};
+
+/* ---- ошибки ---- */
+function addError(mode, orig, fixed){
+ for(var i=0;i<errors.length;i++){
+  if(errors[i].orig===orig){
+   errors[i].fixed=fixed; errors[i].correct=fixed; errors[i].mode=mode;
+   saveErr(); renderErr(); refreshCounts(); renderPk(); openModal('mErr'); return;
   }
+ }
+ errors.push({mode:mode, orig:orig, fixed:fixed, correct:fixed});
+ saveErr(); renderErr(); refreshCounts(); renderPk(); openModal('mErr');
+}
+function renderErr(){
+ var tb=document.querySelector('#errTable tbody'); tb.innerHTML='';
+ errors.forEach(function(e,i){
+  var tr=document.createElement('tr');
+  var c0=document.createElement('td'); c0.className='src'; c0.textContent=e.orig; tr.appendChild(c0);
+  var c1=document.createElement('td'); c1.className='src'; c1.textContent=e.fixed; tr.appendChild(c1);
+  var c2=document.createElement('td');
+  var ta=document.createElement('textarea'); ta.className='correct'; ta.value=(e.correct==null?'':e.correct);
+  ta.addEventListener('input', function(){ errors[i].correct=ta.value; saveErr(); });
+  c2.appendChild(ta); tr.appendChild(c2);
+  var c3=document.createElement('td');
+  var x=document.createElement('button'); x.className='cross'; x.textContent='✕'; x.title='Убрать из ошибок';
+  x.onclick=function(){ errors.splice(i,1); saveErr(); renderErr(); refreshCounts(); renderPk(); };
+  c3.appendChild(x); tr.appendChild(c3);
+  tb.appendChild(tr);
+ });
+ $('errEmpty').style.display = errors.length ? 'none' : '';
+}
+$('btnViewErr').onclick=function(){ renderErr(); openModal('mErr'); };
+$('btnErrClose').onclick=function(){ closeModal('mErr'); };
+$('btnErrDelAll').onclick=function(){
+ if(!errors.length) return;
+ if(confirm('Удалить все сохранённые ошибки?')){ errors=[]; saveErr(); renderErr(); refreshCounts(); renderPk(); }
+};
+$('btnErrExport').onclick=function(){
+ if(!errors.length){ alert('Список ошибок пуст.'); return; }
+ downloadCSV('errors.csv',
+  ['Режим','Исходный адрес','Готовый адрес','Как должно быть'],
+  errors.map(function(e){ return [e.mode, e.orig, e.fixed, (e.correct==null?'':e.correct)]; }));
+};
+function downloadCSV(name, header, rows){
+ var lines=[header].concat(rows);
+ var csv='\ufeff'+lines.map(function(r){
+  return r.map(function(c){ return '"'+String(c==null?'':c).replace(/"/g,'""')+'"'; }).join(';');
+ }).join('\r\n');
+ var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+ var a=document.createElement('a');
+ a.href=URL.createObjectURL(blob); a.download=name;
+ document.body.appendChild(a); a.click();
+ setTimeout(function(){ URL.revokeObjectURL(a.href); document.body.removeChild(a); },100);
+}
 
-  // ---------- отметки в localStorage ----------
-  function loadMarks() {
-    try { return JSON.parse(localStorage.getItem(MARKS_KEY) || '{}'); } catch (e) { return {}; }
+/* ---- пакет ---- */
+$('btnProcess').onclick=function(){
+ var lines = $('pkSrc').value.split(/\r?\n/);
+ var arr=[];
+ for(var i=0;i<lines.length;i++){
+  var l = lines[i].replace(/\t/g,' ').trim();
+  if(l) arr.push({src:l, fix:fixAddress(l)});
+ }
+ pk = arr; savePk(); renderPk();
+ if(!arr.length) alert('Поле пустое — вставьте адреса построчно.');
+};
+$('btnPkExample').onclick=function(){
+ $('pkSrc').value = 'РОССИЯ,141552,Московская обл,Солнечногорский р-н,Ржавки рп,д.15,кв.74\nРОССИЯ,142261,Московская обл,Серпухов г,Михайловка д,д.10,кв.Нет\nРОССИЯ,143582,Московская обл,Истра г,Красный Посёлок д,Английский б-р,д.549,кв.Нет\nРОССИЯ, 127560, Москва г, Конёнкова ул, д.12а, кв.160';
+ $('btnProcess').click();
+};
+$('btnPkClear').onclick=function(){ $('pkSrc').value=''; pk=[]; savePk(); renderPk(); };
+$('btnPkExport').onclick=function(){
+ if(!pk.length){ alert('Пакет ещё не обработан.'); return; }
+ downloadCSV('packet.csv',
+  ['№','Исходный адрес','Готовый адрес','Как должно быть','Ошибка'],
+  pk.map(function(r,i){
+   var e=null;
+   for(var k=0;k<errors.length;k++){ if(errors[k].orig===r.src){ e=errors[k]; break; } }
+   return [i+1, r.src, r.fix, e?(e.correct==null?'':e.correct):'', e?'да':''];
+  }));
+};
+function renderPk(){
+ var tb=document.querySelector('#pkTable tbody'); tb.innerHTML='';
+ pk.forEach(function(r,i){
+  var tr=document.createElement('tr');
+  var c0=document.createElement('td'); c0.textContent=i+1; tr.appendChild(c0);
+  var c1=document.createElement('td'); c1.className='src'; c1.textContent=r.src; tr.appendChild(c1);
+  var c2=document.createElement('td'); c2.className='fix'; c2.textContent=r.fix; tr.appendChild(c2);
+  var marked=false;
+  for(var k=0;k<errors.length;k++){ if(errors[k].orig===r.src){ marked=true; break; } }
+  if(marked){
+   tr.classList.add('err-row');
+   var tag=document.createElement('span'); tag.className='tag'; tag.textContent='ошибка';
+   c2.appendChild(tag);
   }
-  function saveMarks(m) {
-    try { localStorage.setItem(MARKS_KEY, JSON.stringify(m)); } catch (e) {}
-  }
+  var c3=document.createElement('td');
+  var b1=document.createElement('button'); b1.textContent='Копировать';
+  b1.onclick=function(){ copyText(r.fix, b1); };
+  c3.appendChild(b1); tr.appendChild(c3);
+  var c4=document.createElement('td');
+  var b2=document.createElement('button'); b2.textContent = marked ? 'Ошибка ✓' : 'Ошибка';
+  if(marked) b2.classList.add('ok');
+  b2.onclick=function(){ addError('пакет', r.src, r.fix); };
+  c4.appendChild(b2); tr.appendChild(c4);
+  tb.appendChild(tr);
+ });
+}
 
-  // ---------- разбор даты ----------
-  function parseDate(s) {
-    s = (s || '').replace(/0:00:00/g, '').trim();
-    var m = s.match(/(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})/);
-    if (m) return { d: m[1].padStart(2, '0'), m: m[2].padStart(2, '0'), y: m[3] };
-    m = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
-    if (m) return { d: m[3].padStart(2, '0'), m: m[2].padStart(2, '0'), y: m[1] };
-    return null;
-  }
+/* ---- модальные окна ---- */
+function openModal(id){ $(id).classList.add('open'); }
+function closeModal(id){ $(id).classList.remove('open'); }
+$('btnHelp').onclick=function(){ openModal('mHelp'); };
+$('btnRules').onclick=function(){ openModal('mRules'); };
+document.querySelectorAll('.modal').forEach(function(m){
+ m.addEventListener('click', function(ev){ if(ev.target===m) m.classList.remove('open'); });
+});
 
-  // ---------- разбор строк ----------
-  function parseLines(text) {
-    var out = [];
-    String(text || '').split(/\r?\n/).forEach(function (line) {
-      line = line.trim();
-      if (!line) return;
-      var fio = line, dstr = '';
-      if (line.indexOf('\t') >= 0) {
-        // две колонки из Excel: находим колонку с датой, остальное — ФИО
-        var cols = line.split('\t').map(function (x) { return x.trim(); })
-          .filter(function (x) { return x; });
-        var di = -1, i;
-        for (i = 0; i < cols.length; i++) { if (parseDate(cols[i])) { di = i; break; } }
-        if (di >= 0) { dstr = cols[di]; cols.splice(di, 1); }
-        fio = cols.join(' ');
-      } else {
-        // дата в конце строки
-        var m = line.match(/(\d{1,2}[.\-/]\d{1,2}[.\-/]\d{4}|\d{4}-\d{1,2}-\d{1,2})\s*$/);
-        if (m) { dstr = m[1]; fio = line.substring(0, m.index).trim(); }
-      }
-      var d = parseDate(dstr);
-      var parts = fio.split(/\s+/).filter(Boolean);
-      out.push({
-        fam: parts[0] || '',
-        nam: parts[1] || '',
-        otc: parts.slice(2).join(' '),
-        d: d ? d.d : '',
-        m: d ? d.m : '',
-        y: d ? d.y : '',
-        hasDate: !!d
-      });
-    });
-    return out;
-  }
-
-  function key(p) {
-    return [p.fam, p.nam, p.otc, p.d + '.' + p.m + '.' + p.y].join('|');
-  }
-
-  function url(p) {
-    var u = 'https://fssp.gov.ru/iss/ip?searchType=1&fam=' + encodeURIComponent(p.fam) +
-      '&nam=' + encodeURIComponent(p.nam);
-    if (p.otc) u += '&otc=' + encodeURIComponent(p.otc);
-    if (p.hasDate) u += '&bday=' + p.d + '&bmonth=' + p.m + '&byear=' + p.y;
-    return u;
-  }
-
-  // ---------- режим одной строки: предпросмотр ----------
-  function setField(id, v) {
-    var el = document.getElementById(id);
-    el.textContent = v || '—';
-    el.className = v ? 'ok' : 'miss';
-  }
-
-  function renderPreview(p) {
-    setField('p-fam', p ? p.fam : '');
-    setField('p-nam', p ? p.nam : '');
-    setField('p-otc', p ? p.otc : '');
-    setField('p-date', p && p.hasDate ? p.d + '.' + p.m + '.' + p.y : '');
-    btnGo.disabled = !(p && p.fam && p.hasDate);
-  }
-
-  // ---------- очередь ----------
-  function renderQueue(people) {
-    var marks = loadMarks();
-    var valid = people.filter(function (p) { return p.fam && p.hasDate; });
-    var doneCount = valid.filter(function (p) { return marks[key(p)]; }).length;
-    qCounter.textContent = 'В списке ' + valid.length + ' чел. · обработано ' + doneCount + ' из ' + valid.length;
-
-    var html = '';
-    people.forEach(function (p, i) {
-      var ok = p.fam && p.hasDate;
-      var pressed = ok && !!marks[key(p)];
-      html += '<div class="q-row' + (ok ? '' : ' q-bad') + '">' +
-        '<div class="q-fio">' + (i + 1) + '. ' +
-        esc([p.fam, p.nam, p.otc].filter(Boolean).join(' ')) +
-        (ok ? '' : ' <span class="warn">— нет даты</span>') + '</div>' +
-        '<div class="q-date">' + (p.hasDate ? p.d + '.' + p.m + '.' + p.y : '—') + '</div>';
-      if (ok) {
-        html += '<button class="btn small' + (pressed ? ' done' : '') + '" data-i="' + i + '">' +
-          (pressed ? '✓ Нажата' : 'Найти') + '</button>';
-      } else {
-        html += '<button class="btn small" disabled>—</button>';
-      }
-      html += '</div>';
-    });
-    qList.innerHTML = html;
-
-    Array.prototype.forEach.call(qList.querySelectorAll('button[data-i]'), function (b) {
-      b.addEventListener('click', function () {
-        var p = people[+b.getAttribute('data-i')];
-        window.open(url(p), '_blank');
-        var m = loadMarks();
-        m[key(p)] = true;
-        saveMarks(m);
-        render();
-      });
-    });
-  }
-
-  // ---------- общий рендер ----------
-  function render() {
-    var people = parseLines(input.value);
-    var queueMode = people.length > 1;
-    queueBox.style.display = queueMode ? 'block' : 'none';
-    btnReset.style.display = queueMode ? '' : 'none';
-    btnGo.style.display = queueMode ? 'none' : '';
-    btnGo.disabled = queueMode;
-    if (queueMode) renderQueue(people);
-    else renderPreview(people[0] || null);
-  }
-
-  // ---------- кнопки ----------
-  btnGo.addEventListener('click', function () {
-    var valid = parseLines(input.value).filter(function (p) { return p.fam && p.hasDate; });
-    if (!valid.length) return;
-    window.open(url(valid[0]), '_blank');
-  });
-
-  btnTest.addEventListener('click', function () {
-    input.value = 'Иванов Иван Иванович 01.01.1950';
-    render();
-    btnGo.click();
-  });
-
-  btnClear.addEventListener('click', function () {
-    input.value = '';
-    render();
-    input.focus();
-  });
-
-  btnReset.addEventListener('click', function () {
-    var people = parseLines(input.value);
-    var m = loadMarks();
-    people.forEach(function (p) { delete m[key(p)]; });
-    saveMarks(m);
-    render();
-  });
-
-  btnHelp.addEventListener('click', function () {
-    var open = helpPanel.style.display !== 'none';
-    helpPanel.style.display = open ? 'none' : 'block';
-    btnHelp.textContent = open ? '📖 Как всё настроить' : '📖 Скрыть справку';
-    if (!open) helpPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  btnCopy.addEventListener('click', function () {
-    var txt = document.getElementById('userscript-src').textContent.trim();
-    function showOk() {
-      copyMsg.style.display = 'block';
-      setTimeout(function () { copyMsg.style.display = 'none'; }, 4000);
-    }
-    function fallback() {
-      var ta = document.createElement('textarea');
-      ta.value = txt;
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); showOk(); } catch (e) {}
-      ta.remove();
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt).then(showOk, fallback);
-    } else fallback();
-  });
-
-  // ---------- тема ----------
-  var themeBtn = document.getElementById('theme-toggle');
-  try {
-    if (localStorage.getItem('fssp_theme') === 'light') document.body.classList.add('light');
-  } catch (e) {}
-  themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
-  themeBtn.addEventListener('click', function () {
-    document.body.classList.toggle('light');
-    try {
-      localStorage.setItem('fssp_theme', document.body.classList.contains('light') ? 'light' : 'dark');
-    } catch (e) {}
-    themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
-  });
-
-  // ---------- скрипт в блоке ручного копирования ----------
-  document.getElementById('script-plain').textContent =
-    document.getElementById('userscript-src').textContent.trim();
-
-  input.addEventListener('input', render);
-  render();
-})();
+refreshCounts(); renderPk(); renderErr();
 </script>
 </body>
 </html>
